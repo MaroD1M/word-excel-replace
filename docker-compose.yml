@@ -4,6 +4,7 @@ services:
   word-excel-replace:
     image: ghcr.io/${GITHUB_USERNAME:-MaroD1M}/word-excel-replace-tool:${TAG:-latest}
     container_name: word-excel-replace-tool
+    network_mode: bridge
     ports:
       - "${EXTERNAL_PORT:-12344}:8501"
     restart: unless-stopped
@@ -13,5 +14,6 @@ services:
     # 可选：数据持久化
     # volumes:
     #   - ./data:/app/data
+
 
 

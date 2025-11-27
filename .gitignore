@@ -26,7 +26,10 @@ wheels/
 env/
 venv/
 ENV/
-
+.git
+.github
+readme.md
+deploy.sh
 # IDE
 .vscode/
 .idea/

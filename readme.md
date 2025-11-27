@@ -23,12 +23,18 @@
 ### 🐳 Docker 一键部署（推荐）
 
 ```Bash
-# 使用最新版本
-docker run -p 12344:8501 ghcr.io/你的用户名/word-excel-replace-tool:latest
-# 或使用 docker-compose
-git clone https://github.com/你的用户名/word-excel-replace-tool.git
-cd word-excel-replace-tool
-docker-compose up -d
+version: '3.8'
+services:
+  word-excel-replace:
+    image: ghcr.io/marod1m/word-excel-replace:latest
+    container_name: Word-excel-replace-tool
+    network_mode: bridge
+    ports:
+      - "12344:8501"
+    restart: no
+    environment:
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
 ```
 

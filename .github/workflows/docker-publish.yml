@@ -1,12 +1,11 @@
-name: Build and Push to GitHub Packages
+name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
+    tags: ['v*']  # 添加标签触发
   pull_request:
-    branches: [ main, master ]
-  release:
-    types: [published]
+    branches: [ main ]
 
 env:
   REGISTRY: ghcr.io
@@ -40,10 +39,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=ref,event=pr
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
@@ -55,3 +51,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64  # 添加多平台支持

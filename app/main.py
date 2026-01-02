@@ -21,7 +21,7 @@ from collections import defaultdict
 from decimal import Decimal, ROUND_HALF_UP
 
 # 项目版本信息
-VERSION = "1.2.2"
+VERSION = "1.2.3"
 
 # 配置常量
 PAGE_SIZE = 10  # 每页显示的文件数

@@ -1,16 +1,19 @@
 # 使用多阶段构建来减小镜像体积
 # 第一阶段：构建阶段，安装所有依赖
-FROM python:3.10-slim AS builder
+FROM python:3.10-alpine AS builder
 
 WORKDIR /app
 
-# 安装编译依赖
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# 安装编译依赖和系统包
+RUN apk add --no-cache --virtual .build-deps \
     gcc \
     g++ \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    musl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    && apk add --no-cache \
+    libxml2 \
+    libxslt
 
 # 复制 requirements.txt
 COPY requirements.txt .
@@ -19,10 +22,20 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir --prefix=/install -r requirements.txt
 
+# 清理构建依赖
+RUN apk del .build-deps
+
 # 第二阶段：运行阶段，只保留必要的依赖
-FROM python:3.10-slim
+FROM python:3.10-alpine
 
 WORKDIR /app
+
+# 安装运行时依赖
+RUN apk add --no-cache \
+    libxml2 \
+    libxslt \
+    libgcc \
+    libstdc++
 
 # 从构建阶段复制安装好的依赖
 COPY --from=builder /install /usr/local

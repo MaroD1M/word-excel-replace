@@ -19,11 +19,12 @@ RUN apk add --no-cache --virtual .build-deps \
 COPY requirements.txt .
 
 # 升级 pip 并安装依赖到一个临时目录
-RUN pip install --upgrade pip && \
+RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# 清理构建依赖
-RUN apk del .build-deps
+# 清理构建依赖和临时文件
+RUN apk del .build-deps && \
+    rm -rf /tmp/* /var/tmp/*
 
 # 第二阶段：运行阶段，只保留必要的依赖
 FROM python:3.10-alpine
@@ -42,6 +43,11 @@ COPY --from=builder /install /usr/local
 
 # 复制应用代码
 COPY app/ ./app/
+
+# 清理Python环境中不需要的文件
+RUN find /usr/local/lib/python3.10 -name "__pycache__" -type d -exec rm -rf {} + && \
+    find /usr/local/lib/python3.10 -name "*.pyc" -delete && \
+    rm -rf /usr/local/lib/python3.10/site-packages/pip /usr/local/lib/python3.10/site-packages/setuptools
 
 # 暴露端口
 EXPOSE 8501
